@@ -124,17 +124,17 @@
     }
 
     .image-container {
-      flex: 1;
-      min-width: 500px;
-      height: 667px;
-      background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 500px;
+      height: 500px;
+      margin: 0 auto;
+      background-color: white;
       border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
     }
 
     .image-container canvas {
@@ -232,9 +232,9 @@
     </div>
     <div class="image-container">
       <img id="baseImage" src="BASE.png" alt="Base Image" onload="console.log('Base image loaded')" onerror="console.error('Error loading base image')">
-      <img id="shirtImage" src="" alt="Selected Shirt" style="display: none; z-index: 3;">
-      <img id="skirtImage" src="" alt="Selected Skirt" style="display: none; z-index: 1;">
-      <img id="dressesImage" src="" alt="Selected Dress" style="display: none; z-index: 2;">
+      <img id="shirtImage" src="" alt="Selected Shirt" style="display: none; z-index: 3; position: absolute; top: 0; left: 0;">
+      <img id="skirtImage" src="" alt="Selected Skirt" style="display: none; z-index: 1; position: absolute; top: 0; left: 0;">
+      <img id="dressesImage" src="" alt="Selected Dress" style="display: none; z-index: 2; position: absolute; top: 0; left: 0;">
     </div>
   </div>
   <script>
