@@ -214,99 +214,110 @@
     </div>
   </div>
   <script>
-    let baseImage;
-    let currentImage;
-    let imgMap = {};
-    let activeTab = 'shirts';
-    let activeItems = {
-      shirts: '',
-      skirts: '',
-      dresses: ''
+    // p5.js sketch
+    let sketch = function(p) {
+      let baseImage;
+      let imgMap = {};
+      let activeItems = {
+        shirt: '',
+        skirt: '',
+        dress: ''
+      };
+
+      p.preload = function() {
+        baseImage = p.loadImage('BASE.png');
+        // Preload all images
+        ['shirt1.png', 'shirt2.png', 'shirt3.png', 'shirt4.png', 'shirt5.png',
+         'skirt1.png', 'skirt2.png', 'skirt3.png', 'skirt4.png', 'skirt5.png',
+         'dress1.png', 'dress2.png', 'dress3.png', 'dress4.png', 'dress5.png', 'dress6.png']
+          .forEach(imgName => {
+            imgMap[imgName] = p.loadImage(imgName);
+          });
+      };
+
+      p.setup = function() {
+        let canvas = p.createCanvas(500, 667);
+        canvas.parent('fashionCanvas');
+        p.noLoop();
+      };
+
+      p.draw = function() {
+        p.clear();
+        // Draw base image
+        if (baseImage) {
+          p.image(baseImage, 0, 0);
+        }
+        
+        // Draw active clothing items in order (skirt, dress, shirt)
+        if (activeItems.skirt && imgMap[activeItems.skirt]) {
+          p.image(imgMap[activeItems.skirt], 0, 0);
+        }
+        if (activeItems.dress && imgMap[activeItems.dress]) {
+          p.image(imgMap[activeItems.dress], 0, 0);
+        }
+        if (activeItems.shirt && imgMap[activeItems.shirt]) {
+          p.image(imgMap[activeItems.shirt], 0, 0);
+        }
+      };
+
+      // Make these functions available globally
+      window.selectItem = function(imgName, type) {
+        // Update active item
+        activeItems[type] = imgName;
+        
+        // Update UI
+        const prevActive = document.querySelector(`.clothing-item[data-type="${type}"].active`);
+        if (prevActive) {
+          prevActive.classList.remove('active');
+        }
+        
+        const newActive = document.querySelector(`.clothing-item[data-type="${type}"][onclick*="${imgName}"]`);
+        if (newActive) {
+          newActive.classList.add('active');
+        }
+        
+        // Redraw the canvas
+        p.redraw();
+      };
+
+      window.removeItem = function(type) {
+        // Remove active class from current item
+        const activeItem = document.querySelector(`.clothing-item[data-type="${type}"].active`);
+        if (activeItem) {
+          activeItem.classList.remove('active');
+        }
+
+        // Clear the active item
+        activeItems[type] = '';
+        
+        // Redraw the canvas
+        p.redraw();
+      };
     };
 
-    function preload() {
-      baseImage = loadImage('BASE.png');
-      // Preload all images
-      ['shirt1.png', 'shirt2.png', 'shirt3.png', 'shirt4.png', 'shirt5.png',
-       'skirt1.png', 'skirt2.png', 'skirt3.png', 'skirt4.png', 'skirt5.png',
-       'dress1.png', 'dress2.png', 'dress3.png', 'dress4.png', 'dress5.png', 'dress6.png']
-        .forEach(imgName => {
-          imgMap[imgName] = loadImage(imgName);
-        });
-    }
-
-    function setup() {
-      createCanvas(500, 667);
-      drawBase();
-    }
-
-    function draw() {
-      drawBase();
-      // Draw active clothing items in order (skirt, dress, shirt)
-      const clothingOrder = ['skirts', 'dresses', 'shirts'];
-      clothingOrder.forEach(type => {
-        if (activeItems[type]) {
-          image(imgMap[activeItems[type]], 0, 0);
-        }
-      });
-    }
-
-    function drawBase() {
-      if (baseImage) {
-        image(baseImage, 0, 0);
-      }
-    }
-
-    function selectItem(imgName, type) {
-      // Remove active class from previous item
-      const prevActive = document.querySelector(`.clothing-item[data-type="${type}"][class*="active"]`);
-      if (prevActive) {
-        prevActive.classList.remove('active');
-      }
-
-      // Add active class to new item
-      const newActive = document.querySelector(`.clothing-item[data-type="${type}"] img[src="${imgName}"]`).parentElement;
-      if (newActive) {
-        newActive.classList.add('active');
-      }
-
-      // Update active item
-      activeItems[type] = imgName;
-
-      // Update active tab
-      const tabs = document.querySelectorAll('.tab');
-      tabs.forEach(tab => {
-        tab.classList.remove('active');
-        const tabId = tab.getAttribute('data-tab');
-        if (tabId === type) {
-          tab.classList.add('active');
-        }
-      });
-
-      // Show/hide grid sections
-      const grids = document.querySelectorAll('.tab-content');
-      grids.forEach(grid => {
-        grid.style.display = grid.id === type ? 'block' : 'none';
-      });
-    }
-
-    function removeItem(type) {
-      // Remove active class from current item
-      const activeItem = document.querySelector(`.clothing-item[data-type="${type}"][class*="active"]`);
-      if (activeItem) {
-        activeItem.classList.remove('active');
-      }
-
-      // Clear the active item
-      activeItems[type] = '';
-    }
+    // Create a new p5 instance
+    new p5(sketch);
 
     // Initialize tab click handlers
-    window.addEventListener('load', () => {
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show shirts tab by default
+      document.getElementById('shirts').style.display = 'block';
+      document.querySelector('[data-tab="shirts"]').classList.add('active');
+      
+      // Set up tab switching
       document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          const category = tab.getAttribute('data-tab');
-          selectItem(activeItems[category], category);
+        tab.addEventListener('click', function() {
+          const tabId = this.getAttribute('data-tab');
+          
+          // Update active tab
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Show selected tab content
+          document.querySelectorAll('.tab-content').forEach(content => {
+            content.style.display = 'none';
+          });
+          document.getElementById(tabId).style.display = 'block';
         });
       });
     });
