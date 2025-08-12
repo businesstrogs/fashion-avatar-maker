@@ -358,14 +358,6 @@
     window.addEventListener('load', () => {
       console.log('All images loaded');
       
-      // Check base image
-      const avatarImage = document.getElementById('baseImage');
-      if (avatarImage && avatarImage.complete) {
-        console.log('Base image loaded successfully');
-      } else {
-        console.error('Base image not loaded');
-      }
-
       // Check clothing images
       const shirtImg = document.getElementById('shirtImage');
       const skirtImg = document.getElementById('skirtImage');
