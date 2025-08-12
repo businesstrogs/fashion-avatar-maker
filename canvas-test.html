@@ -145,6 +145,128 @@
       height: 100%;
     }
 
+    @media (max-width: 800px) {
+      .container {
+        flex-direction: column;
+      }
+    }
+
+    .clothing-panel {
+      width: 300px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #B3375B;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 20px;
+      cursor: pointer;
+      text-align: center;
+      border: none;
+      background: none;
+      color: #666;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active {
+      color: #B3375B;
+      border-bottom: 2px solid #B3375B;
+    }
+
+    .tab:hover {
+      color: #B3375B;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 10px 0 20px;
+    }
+
+    .remove-button {
+      width: 100%;
+      padding: 10px;
+      background: #B3375B;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .remove-button:hover {
+      background: #992a4a;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .clothing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .clothing-item {
+      width: 100%;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+    }
+
+    .clothing-item:hover {
+      transform: scale(1.05);
+      transition: transform 0.2s ease;
+    }
+
+    .clothing-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    .clothing-item.active {
+      border: 2px solid #B3375B;
+      box-shadow: 0 0 0 4px rgba(179, 55, 91, 0.3);
+      transition: border 0.2s ease;
+    }
+
+    .image-container {
+      flex: 1;
+      min-width: 500px;
+      height: 667px;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .image-container canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
     .image-container img {
       position: absolute;
       top: 50%;
@@ -232,10 +354,7 @@
       </div>
     </div>
     <div class="image-container">
-      <img id="baseImage" src="./BASE.png" alt="Base Image">
-      <img id="shirtImage" src="" alt="Selected Shirt" style="display: none; z-index: 3;">
-      <img id="skirtImage" src="" alt="Selected Skirt" style="display: none; z-index: 1;">
-      <img id="dressesImage" src="" alt="Selected Dress" style="display: none; z-index: 2;">
+      <canvas id="fashionCanvas"></canvas>
     </div>
   </div>
   <script>
@@ -261,17 +380,11 @@
       const clickedItem = e.currentTarget;
       console.log('Clicked item:', clickedItem);
       
-      // Get the image element
-      const img = document.getElementById(`${type}Image`);
-      console.log('Image element:', img);
-      
       // First, deselect any existing item of the same type
       const prevActive = document.querySelector(`.clothing-item[data-type="${type}"][class*="active"]`);
       if (prevActive) {
         console.log('Deselecting previous item');
         prevActive.classList.remove('active');
-        img.src = '';
-        img.style.display = 'none';
         currentClothing[type] = '';
         clickCount[type] = 0;
       }
@@ -279,11 +392,12 @@
       // Only add active class if we're actually selecting a new item
       if (imgName) {
         clickedItem.classList.add('active');
-        img.src = imgName;
-        img.style.display = 'block';
         currentClothing[type] = imgName;
         clickCount[type] = 1;
       }
+      
+      // Redraw the canvas
+      drawAvatar();
     }
 
     // Remove item function
@@ -297,13 +411,9 @@
       }
       
       // Hide the image
-      const img = document.getElementById(`${type}Image`);
-      if (img) {
-        img.src = '';
-        img.style.display = 'none';
-        currentClothing[type] = '';
-        clickCount[type] = 0;
-      }
+      currentClothing[type] = '';
+      clickCount[type] = 0;
+      drawAvatar();
     }
 
     // Setup click handlers
@@ -316,17 +426,8 @@
       
       // Add click handlers
       clothingItems.forEach(item => {
-        console.log('Adding click handler to:', item);
-        item.addEventListener('click', (e) => {
-          console.log('Item clicked:', e.currentTarget);
-          
-          // Get image name from the clicked item
-          const imgElement = e.currentTarget.querySelector('img');
-          if (!imgElement) {
-            console.error('No image found in clicked item');
-            return;
-          }
-          
+        const imgElement = item.querySelector('img');
+        if (imgElement) {
           const imgName = imgElement.src.split('/').pop();
           const type = e.currentTarget.dataset.type;
           
@@ -359,28 +460,51 @@
     window.addEventListener('load', () => {
       console.log('All images loaded');
       
-      // Check base image
-      const baseImage = document.getElementById('baseImage');
-      if (baseImage && baseImage.complete) {
-        console.log('Base image loaded successfully');
-      } else {
-        console.error('Base image not loaded');
+      // Initialize canvas
+      const canvas = document.getElementById('fashionCanvas');
+      canvas.width = 500;
+      canvas.height = 667;
+      const ctx = canvas.getContext('2d');
+
+      // Load and draw base image
+      const baseImage = new Image();
+      baseImage.src = 'BASE.png';
+      baseImage.onload = () => {
+        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+      };
+
+      // Function to draw the avatar
+      function drawAvatar() {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw base image
+        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+        
+        // Draw clothing items in order (skirt, dress, shirt)
+        const clothingOrder = ['skirt', 'dress', 'shirt'];
+        clothingOrder.forEach(type => {
+          if (currentClothing[type]) {
+            const img = new Image();
+            img.src = currentClothing[type];
+            img.onload = () => {
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+          }
+        });
       }
 
-      // Check clothing images
-      const shirtImg = document.getElementById('shirtImage');
-      const skirtImg = document.getElementById('skirtImage');
+      // Initial draw
+      drawAvatar();
 
-      console.log('Shirt image:', shirtImg);
-      console.log('Skirt image:', skirtImg);
-      
       // Update display states based on current clothing
+      const shirtImg = document.getElementById('shirtImage');
       shirtImg.style.display = currentClothing.shirt ? 'block' : 'none';
+      const skirtImg = document.getElementById('skirtImage');
       skirtImg.style.display = currentClothing.skirt ? 'block' : 'none';
       const dressImg = document.getElementById('dressImage');
       dressImg.style.display = currentClothing.dress ? 'block' : 'none';
     });
   </script>
 </body>
-</html>
 </html>
