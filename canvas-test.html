@@ -238,13 +238,13 @@
     </div>
   </div>
   <script>
-    // Initialize state
+    // Store current clothing selections
     let currentClothing = {
       shirt: '',
       skirt: '',
       dress: ''
     };
-
+    
     // Track click counts
     let clickCount = {
       shirt: 0,
@@ -359,8 +359,8 @@
       console.log('All images loaded');
       
       // Check base image
-      const baseImage = document.getElementById('baseImage');
-      if (baseImage && baseImage.complete) {
+      const avatarImage = document.getElementById('baseImage');
+      if (avatarImage && avatarImage.complete) {
         console.log('Base image loaded successfully');
       } else {
         console.error('Base image not loaded');
