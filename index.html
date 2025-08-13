@@ -78,10 +78,10 @@
       }
       
       /* Force 2x2 grid for clothing options */
-      .clothing-options {
+      .clothing-grid {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 4px;
+        gap: 8px;
         padding: 5px;
         width: 100%;
         box-sizing: border-box;
@@ -94,6 +94,15 @@
         margin: 0 !important;
         padding: 5px !important;
         box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .clothing-item img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
       }
       
       .clothing-item {
