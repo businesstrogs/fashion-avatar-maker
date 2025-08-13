@@ -58,50 +58,73 @@
     /* Phone-specific adjustments */
     @media (max-width: 768px) and (orientation: portrait) {
       body {
-        padding: 5px !important;
-        overflow-x: auto;
+        padding: 2px !important;
+        overflow-x: hidden;
         min-width: 100%;
+        font-size: 12px;
       }
       
       .container {
         min-width: 100%;
         width: 100%;
-        padding: 5px;
+        padding: 2px;
         flex-direction: column;
         height: auto;
         min-height: 100vh;
+        gap: 5px;
       }
       
       .clothing-panel {
         width: 100%;
         height: auto;
-        min-height: 300px;
-        margin-bottom: 10px;
+        min-height: 200px;
+        margin-bottom: 5px;
+        padding: 5px;
       }
       
       .clothing-options {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 5px;
+        gap: 3px;
+        padding: 0;
       }
       
       .clothing-item {
         margin: 0;
-        padding: 5px;
+        padding: 2px;
+        height: 120px;
+      }
+      
+      .clothing-item img {
+        height: 80px;
+        width: auto;
+        margin: 0 auto;
+        display: block;
       }
       
       .image-container {
-        height: 70vh;
-        min-height: 500px;
+        height: 60vh;
+        min-height: 300px;
+        padding: 5px;
       }
       
       .tabs {
         flex-wrap: wrap;
+        padding: 0;
+        margin: 0 0 5px 0;
       }
       
       .tab {
-        padding: 8px 12px;
-        font-size: 14px;
+        padding: 4px 8px;
+        font-size: 12px;
+        margin: 1px;
+        flex-grow: 1;
+        text-align: center;
+      }
+      
+      h2 {
+        margin: 5px 0 !important;
+        font-size: 16px !important;
       }
     }
 
