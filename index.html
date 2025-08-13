@@ -35,16 +35,17 @@
 
     .container {
       display: flex;
-      gap: 20px;
-      max-width: 1200px;
+      gap: 10px;
       width: 100%;
+      max-width: 100%;
+      min-width: 1080px; /* Set minimum width */
+      margin: 0 auto;
       position: relative;
       background: #efa4ab;
       border: 2px solid #bdd6e0;
       border-radius: 8px;
-      padding: 20px;
+      padding: 15px;
       box-sizing: border-box;
-      min-height: 0;
     }
 
     /* Mobile adjustments */
@@ -164,15 +165,15 @@
     }
 
     .clothing-panel {
-      width: 300px;
-      min-width: 300px;
+      width: 280px; /* Reduced from 300px */
+      min-width: 280px; /* Reduced from 300px */
       background: #117281;
-      padding: 20px;
+      padding: 15px; /* Reduced from 20px */
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       border: 2px solid #bdd6e0;
       overflow-y: auto;
-      height: 800px;
+      height: 750px; /* Reduced from 800px */
       box-sizing: border-box;
     }
     
@@ -319,7 +320,7 @@
       border: 2px solid #bdd6e0;
       position: relative;
       overflow: hidden;
-      padding: 20px;
+      padding: 15px; /* Reduced from 20px */
       box-sizing: border-box;
     }
     
