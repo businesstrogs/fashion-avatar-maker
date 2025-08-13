@@ -49,6 +49,63 @@
     }
 
     /* Mobile adjustments */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      html {
+        font-size: 50%;
+      }
+    }
+    
+    /* Phone-specific adjustments */
+    @media (max-width: 768px) and (orientation: portrait) {
+      body {
+        padding: 5px !important;
+        overflow-x: auto;
+        min-width: 100%;
+      }
+      
+      .container {
+        min-width: 100%;
+        width: 100%;
+        padding: 5px;
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+      }
+      
+      .clothing-panel {
+        width: 100%;
+        height: auto;
+        min-height: 300px;
+        margin-bottom: 10px;
+      }
+      
+      .clothing-options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+      }
+      
+      .clothing-item {
+        margin: 0;
+        padding: 5px;
+      }
+      
+      .image-container {
+        height: 70vh;
+        min-height: 500px;
+      }
+      
+      .tabs {
+        flex-wrap: wrap;
+      }
+      
+      .tab {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+    }
+
+    /* Mobile adjustments */
     @media (max-width: 1024px) {
       .container {
         flex-direction: row;
