@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fashion Avatar Maker</title>
+  <style>
+    :root {
+      --accent-color: #B3375B;
+      --panel-bg: rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #B3375B;
+    }
+
+    .container {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 800px) {
+      .container {
+        flex-direction: column;
+      }
+    }
+
+    .clothing-panel {
+      width: 300px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #B3375B;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 20px;
+      cursor: pointer;
+      text-align: center;
+      border: none;
+      background: none;
+      color: #666;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active {
+      color: #B3375B;
+      border-bottom: 2px solid #B3375B;
+    }
+
+    .tab:hover {
+      color: #B3375B;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 10px 0 20px;
+    }
+
+    .remove-button {
+      width: 100%;
+      padding: 10px;
+      background: #B3375B;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .remove-button:hover {
+      background: #992a4a;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .clothing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .clothing-item {
+      width: 100%;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+    }
+
+    .clothing-item:hover {
+      transform: scale(1.05);
+      transition: transform 0.2s ease;
+    }
+
+    .clothing-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    .clothing-item.active {
+      border: 2px solid #B3375B;
+      box-shadow: 0 0 0 4px rgba(179, 55, 91, 0.3);
+      transition: border 0.2s ease;
+    }
+
+    .image-container {
+      width: 500px;
+      height: 500px;
+      margin: 0 auto;
+      background-color: #f0e2e4;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .avatar-wrapper img {
+      position: absolute;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      object-fit: contain;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="clothing-panel">
+      <h2 style="margin-bottom: 20px; color: #B3375B; text-align: center">Clothing Selection</h2>
+      <div class="tabs">
+        <button class="tab active" data-tab="shirts">Shirts</button>
+        <button class="tab" data-tab="skirts">Skirts</button>
+        <button class="tab" data-tab="dresses">Dresses</button>
+      </div>
+      <div class="tab-content active" id="shirts">
+          <div class="clothing-grid">
+            <!-- Shirts -->
+            <div class="clothing-item" data-type="shirt" onclick="toggleItem('shirt1.png', 'shirt')">
+              <img src="shirt1.png" alt="Shirt 1">
+            </div>
+            <div class="clothing-item" data-type="shirt" onclick="toggleItem('shirt2.png', 'shirt')">
+              <img src="shirt2.png" alt="Shirt 2">
+            </div>
+            <div class="clothing-item" data-type="shirt" onclick="toggleItem('shirt3.png', 'shirt')">
+              <img src="shirt3.png" alt="Shirt 3">
+            </div>
+            <div class="clothing-item" data-type="shirt" onclick="toggleItem('shirt4.png', 'shirt')">
+              <img src="shirt4.png" alt="Shirt 4">
+            </div>
+            <div class="clothing-item" data-type="shirt" onclick="toggleItem('shirt5.png', 'shirt')">
+              <img src="shirt5.png" alt="Shirt 5">
+            </div>
+          </div>
+          <button class="remove-button" onclick="removeItem('shirt')">Remove Shirt</button>
+      </div>
+      <div class="tab-content" id="skirts">
+          <div class="clothing-grid">
+            <!-- Skirts -->
+            <div class="clothing-item" data-type="skirt" onclick="toggleItem('skirt1.png', 'skirt')">
+              <img src="skirt1.png" alt="Skirt 1">
+            </div>
+            <div class="clothing-item" data-type="skirt" onclick="toggleItem('skirt2.png', 'skirt')">
+              <img src="skirt2.png" alt="Skirt 2">
+            </div>
+            <div class="clothing-item" data-type="skirt" onclick="toggleItem('skirt3.png', 'skirt')">
+              <img src="skirt3.png" alt="Skirt 3">
+            </div>
+            <div class="clothing-item" data-type="skirt" onclick="toggleItem('skirt4.png', 'skirt')">
+              <img src="skirt4.png" alt="Skirt 4">
+            </div>
+            <div class="clothing-item" data-type="skirt" onclick="toggleItem('skirt5.png', 'skirt')">
+            </div>
+          </div>
+          <button class="remove-button" onclick="removeItem('skirt')">Remove Skirt</button>
+      </div>
+      <div class="tab-content" id="dresses">
+        <div class="clothing-grid">
+          <div class="clothing-item" data-type="dresses">
+            <img src="dress1.png" alt="Dress 1" onload="console.log('Dress 1 loaded')" onerror="console.error('Error loading dress1.png')">
+          </div>
+          <div class="clothing-item" data-type="dresses">
+            <img src="dress2.png" alt="Dress 2" onload="console.log('Dress 2 loaded')" onerror="console.error('Error loading dress2.png')">
+          </div>
+          <div class="clothing-item" data-type="dresses">
+            <img src="dress3.png" alt="Dress 3" onload="console.log('Dress 3 loaded')" onerror="console.error('Error loading dress3.png')">
+          </div>
+          <div class="clothing-item" data-type="dresses">
+            <img src="dress4.png" alt="Dress 4" onload="console.log('Dress 4 loaded')" onerror="console.error('Error loading dress4.png')">
+          </div>
+          <div class="clothing-item" data-type="dresses">
+            <img src="dress5.png" alt="Dress 5" onload="console.log('Dress 5 loaded')" onerror="console.error('Error loading dress5.png')">
+          </div>
+
+        </div>
+        <button class="remove-button" onclick="removeItem('dresses')">Remove Dress</button>
+      </div>
+    </div>
+    <div class="image-container">
+      <div class="avatar-wrapper">
+        <img id="baseImage" src="BASE.png" alt="Base Image" onload="console.log('Base image loaded')" onerror="console.error('Error loading base image')">
+        <img id="shirtImage" src="" alt="Selected Shirt" style="display: none; z-index: 3;">
+        <img id="skirtImage" src="" alt="Selected Skirt" style="display: none; z-index: 1;">
+        <img id="dressesImage" src="" alt="Selected Dress" style="display: none; z-index: 2;">
+      </div>
+    </div>
+  </div>
+  <script>
+    // Store current clothing selections
+    let currentClothing = {
+      shirt: '',
+      skirt: '',
+      dress: ''
+    };
+    
+    // Track click counts
+    let clickCount = {
+      shirt: 0,
+      skirt: 0,
+      dress: 0
+    };
+
+    // Handle clicks
+    function handleClick(imgName, type, e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('Click received for:', type, 'image:', imgName);
+      
+      // Get the clicked item from the event
+      const clickedItem = e.currentTarget;
+      
+      // Toggle active class on the clicked item
+      const isActive = clickedItem.classList.contains('active');
+      
+      // Remove active class from all items of the same type
+      document.querySelectorAll(`.clothing-item[data-type="${type}"]`).forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      if (isActive) {
+        // If clicking an active item, deselect it
+        currentClothing[type] = '';
+        document.getElementById(`${type}Image`).style.display = 'none';
+      } else {
+        // Select the new item
+        clickedItem.classList.add('active');
+        currentClothing[type] = imgName;
+        
+        // Handle dress vs shirt/skirt exclusivity
+        if (type === 'dress') {
+          // Deselect shirt and skirt when dress is selected
+          currentClothing.shirt = '';
+          currentClothing.skirt = '';
+          document.getElementById('shirtImage').style.display = 'none';
+          document.getElementById('skirtImage').style.display = 'none';
+          // Remove active class from shirt and skirt items
+          document.querySelectorAll('.clothing-item[data-type="shirt"], .clothing-item[data-type="skirt"]')
+            .forEach(item => item.classList.remove('active'));
+        } else if (type === 'shirt' || type === 'skirt') {
+          // Deselect dress when shirt or skirt is selected
+          currentClothing.dress = '';
+          document.getElementById('dressesImage').style.display = 'none';
+          // Remove active class from dress items
+          document.querySelectorAll('.clothing-item[data-type="dress"]')
+            .forEach(item => item.classList.remove('active'));
+        }
+        
+        // Update the displayed image
+        const imgElement = document.getElementById(`${type}Image`);
+        if (imgElement) {
+          imgElement.src = imgName;
+          imgElement.style.display = 'block';
+          console.log('Displaying image:', imgName, 'for type:', type);
+        }
+      }
+    }
+
+    // Remove item function
+    function removeItem(type) {
+      console.log('Removing item of type:', type);
+      
+      // Remove active class from all items of this type
+      document.querySelectorAll(`.clothing-item[data-type="${type}"]`).forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Clear the current clothing
+      currentClothing[type] = '';
+      
+      // Hide the corresponding image
+      const imgElement = document.getElementById(`${type}Image`);
+      if (imgElement) {
+        imgElement.style.display = 'none';
+      }
+      
+      console.log('Item removed, current state:', currentClothing);
+      
+      // If removing shirt or skirt, also check if we need to handle dress state
+      if ((type === 'shirt' || type === 'skirt') && currentClothing.dress) {
+        // If we have a dress selected, make sure shirt/skirt images are hidden
+        document.getElementById('shirtImage').style.display = 'none';
+        document.getElementById('skirtImage').style.display = 'none';
+      }
+    }
+
+    // Setup click handlers
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, setting up click handlers');
+      
+      // Get all clothing items
+      const clothingItems = document.querySelectorAll('.clothing-item');
+      console.log('Found clothing items:', clothingItems.length);
+      
+      // Add click handlers
+      clothingItems.forEach(item => {
+        console.log('Adding click handler to:', item);
+        item.addEventListener('click', (e) => {
+          console.log('Item clicked:', e.currentTarget);
+          
+          // Get image name from the clicked item
+          const imgElement = e.currentTarget.querySelector('img');
+          if (!imgElement) {
+            console.error('No image found in clicked item');
+            return;
+          }
+          
+          const imgName = imgElement.src.split('/').pop();
+          const type = e.currentTarget.dataset.type;
+          
+          console.log('Calling handleClick with:', imgName, type);
+          handleClick(imgName, type, e);
+        });
+      });
+
+      // Add tab switching functionality
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs
+          tabs.forEach(t => t.classList.remove('active'));
+          // Add active class to clicked tab
+          tab.classList.add('active');
+          
+          // Hide all tab contents
+          const tabContents = document.querySelectorAll('.tab-content');
+          tabContents.forEach(content => content.classList.remove('active'));
+          
+          // Show the selected tab's content
+          const tabContent = document.getElementById(tab.dataset.tab);
+          tabContent.classList.add('active');
+        });
+      });
+    });
+
+    // Check if images are loaded
+    window.addEventListener('load', () => {
+      console.log('All images loaded');
+      
+      // Check clothing images
+      const shirtImg = document.getElementById('shirtImage');
+      const skirtImg = document.getElementById('skirtImage');
+
+      console.log('Shirt image:', shirtImg);
+      console.log('Skirt image:', skirtImg);
+      
+      // Update display states based on current clothing
+      shirtImg.style.display = currentClothing.shirt ? 'block' : 'none';
+      skirtImg.style.display = currentClothing.skirt ? 'block' : 'none';
+      const dressImg = document.getElementById('dressImage');
+      dressImg.style.display = currentClothing.dress ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>
+</html>

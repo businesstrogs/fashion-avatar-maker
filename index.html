@@ -1,326 +1,401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fashion Avatar Maker</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
-  <style>
+    <style>
+    :root {
+      --accent-color: #ff004d;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --panel-bg: rgba(0, 0, 0, 0.1);
+      --transition: cubic-bezier(0.25, 1, 0.25, 1);
+      --aspect-ratio: 7.7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 20px;
-      background-color: #B3375B;
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      color: #333;
     }
 
     .container {
       display: flex;
+      flex-direction: row;
       gap: 20px;
-      max-width: 1200px;
+      max-width: 100%;
       margin: 0 auto;
+      padding: 20px 0;
     }
 
-    .clothing-panel {
-      width: 300px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    @media (max-width: 640px) {
+      .container {
+        flex-direction: column;
+      }
     }
 
-    .tabs {
+    .selector-panel {
+      width: 240px;
+      background: var(--panel-bg);
+      padding: 20px 16px 32px;
+      position: relative;
+    }
+
+    @media (max-width: 640px) {
+      .selector-panel {
+        width: 100%;
+      }
+    }
+
+    .tab-bar {
       display: flex;
-      border-bottom: 2px solid #B3375B;
-      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 24px;
     }
 
     .tab {
       flex: 1;
-      padding: 10px 20px;
-      cursor: pointer;
+      padding: 12px 0;
       text-align: center;
-      border: none;
-      background: none;
-      color: #666;
-      font-weight: 500;
-      transition: all 0.3s ease;
+      cursor: pointer;
+      transition: color 0.2s var(--transition);
     }
 
     .tab.active {
-      color: #B3375B;
-      border-bottom: 2px solid #B3375B;
+      color: var(--accent-color);
+      border-bottom: 2px solid var(--accent-color);
     }
 
-    .tab:hover {
-      color: #B3375B;
-    }
-
-    .tab-content {
-      display: none;
-      padding: 10px 0 20px;
-    }
-
-    .remove-button {
-      width: 100%;
-      padding: 10px;
-      background: #B3375B;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s ease;
-      margin-top: 10px;
-    }
-
-    .remove-button:hover {
-      background: #992a4a;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .clothing-grid {
+    .preview-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 12px;
     }
 
-    .clothing-item {
-      width: 100%;
-      border-radius: 4px;
+    @media (max-width: 640px) {
+      .preview-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .preview-item {
+      width: 96px;
+      height: 96px;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      box-shadow: 0 2px 4px var(--shadow-color);
+      transition: all 0.25s var(--transition);
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      border: 2px solid transparent;
     }
 
-    .clothing-item:hover {
-      transform: scale(1.05);
-      transition: transform 0.2s ease;
+    .preview-item:hover {
+      box-shadow: 0 4px 8px var(--shadow-color);
+      transform: translateY(-2px);
     }
 
-    .clothing-item img {
+    .preview-item.active {
+      border: 4px solid var(--accent-color);
+      border-radius: 4px;
+    }
+
+    .preview-item img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      border-radius: 4px;
     }
 
-    .clothing-item.active {
-      border: 2px solid #B3375B;
-      box-shadow: 0 0 0 4px rgba(179, 55, 91, 0.3);
-      transition: border 0.2s ease;
-    }
-
-    .image-container {
-      width: 500px;
-      height: 667px;
-      margin: 0 auto;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    .preview-stage {
+      flex: 1;
+      min-width: 360px;
+      background: white;
+      padding: 20px;
       position: relative;
-      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    .image-container canvas {
+    .preview-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: calc(100% / var(--aspect-ratio));
+    }
+
+    canvas {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      transition: opacity 0.25s var(--transition);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="clothing-panel">
-      <h2 style="margin-bottom: 20px; color: #B3375B; text-align: center">Clothing Selection</h2>
-      <div class="tabs">
-        <button class="tab active" data-tab="shirts">Shirts</button>
-        <button class="tab" data-tab="skirts">Skirts</button>
-        <button class="tab" data-tab="dresses">Dresses</button>
+    <div class="selector-panel">
+      <div class="tab-bar">
+        <div class="tab active" data-tab="shirts">Shirts</div>
+        <div class="tab" data-tab="skirts">Skirts</div>
+        <div class="tab" data-tab="dresses">Dresses</div>
       </div>
-      <div class="tab-content active" id="shirts">
-        <div class="clothing-grid">
-          <!-- Shirts -->
-          <div class="clothing-item" data-type="shirt" onclick="selectItem('shirt1.png', 'shirt')">
-            <img src="shirt1.png" alt="Shirt 1">
-          </div>
-          <div class="clothing-item" data-type="shirt" onclick="selectItem('shirt2.png', 'shirt')">
-            <img src="shirt2.png" alt="Shirt 2">
-          </div>
-          <div class="clothing-item" data-type="shirt" onclick="selectItem('shirt3.png', 'shirt')">
-            <img src="shirt3.png" alt="Shirt 3">
-          </div>
-          <div class="clothing-item" data-type="shirt" onclick="selectItem('shirt4.png', 'shirt')">
-            <img src="shirt4.png" alt="Shirt 4">
-          </div>
-          <div class="clothing-item" data-type="shirt" onclick="selectItem('shirt5.png', 'shirt')">
-            <img src="shirt5.png" alt="Shirt 5">
-          </div>
+      <div class="preview-grid" id="shirts">
+        <div class="preview-item" onclick="selectItem('shirt1.png', 'shirts')">
+          <img src="shirt1.png" alt="Shirt 1">
         </div>
-        <button class="remove-button" onclick="removeItem('shirt')">Remove Shirt</button>
+        <div class="preview-item" onclick="selectItem('shirt2.png', 'shirts')">
+          <img src="shirt2.png" alt="Shirt 2">
+        </div>
+        <div class="preview-item" onclick="selectItem('shirt3.png', 'shirts')">
+          <img src="shirt3.png" alt="Shirt 3">
+        </div>
+        <div class="preview-item" onclick="selectItem('shirt4.png', 'shirts')">
+          <img src="shirt4.png" alt="Shirt 4">
+        </div>
+        <div class="preview-item" onclick="selectItem('shirt5.PNG', 'shirts')">
+          <img src="shirt5.PNG" alt="Shirt 5">
+        </div>
       </div>
-      <div class="tab-content" id="skirts">
-        <div class="clothing-grid">
-          <!-- Skirts -->
-          <div class="clothing-item" data-type="skirt" onclick="selectItem('skirt1.png', 'skirt')">
-            <img src="skirt1.png" alt="Skirt 1">
-          </div>
-          <div class="clothing-item" data-type="skirt" onclick="selectItem('skirt2.png', 'skirt')">
-            <img src="skirt2.png" alt="Skirt 2">
-          </div>
-          <div class="clothing-item" data-type="skirt" onclick="selectItem('skirt3.png', 'skirt')">
-            <img src="skirt3.png" alt="Skirt 3">
-          </div>
-          <div class="clothing-item" data-type="skirt" onclick="selectItem('skirt4.png', 'skirt')">
-            <img src="skirt4.png" alt="Skirt 4">
-          </div>
-          <div class="clothing-item" data-type="skirt" onclick="selectItem('skirt5.png', 'skirt')">
-            <img src="skirt5.png" alt="Skirt 5">
-          </div>
+      <div class="preview-grid" id="skirts" style="display: none;">
+        <div class="preview-item" onclick="selectItem('skirt1.png', 'skirts')">
+          <img src="skirt1.png" alt="Skirt 1">
         </div>
-        <button class="remove-button" onclick="removeItem('skirt')">Remove Skirt</button>
+        <div class="preview-item" onclick="selectItem('skirt2.png', 'skirts')">
+          <img src="skirt2.png" alt="Skirt 2">
+        </div>
+        <div class="preview-item" onclick="selectItem('skirt3.png', 'skirts')">
+          <img src="skirt3.png" alt="Skirt 3">
+        </div>
+        <div class="preview-item" onclick="selectItem('skirt4.png', 'skirts')">
+          <img src="skirt4.png" alt="Skirt 4">
+        </div>
+        <div class="preview-item" onclick="selectItem('skirt5.PNG', 'skirts')">
+          <img src="skirt5.PNG" alt="Skirt 5">
+        </div>
       </div>
-      <div class="tab-content" id="dresses">
-        <div class="clothing-grid">
-          <!-- Dresses -->
-          <div class="clothing-item" data-type="dress" onclick="selectItem('dress1.png', 'dress')">
-            <img src="dress1.png" alt="Dress 1">
-          </div>
-          <div class="clothing-item" data-type="dress" onclick="selectItem('dress2.png', 'dress')">
-            <img src="dress2.png" alt="Dress 2">
-          </div>
-          <div class="clothing-item" data-type="dress" onclick="selectItem('dress3.png', 'dress')">
-            <img src="dress3.png" alt="Dress 3">
-          </div>
-          <div class="clothing-item" data-type="dress" onclick="selectItem('dress4.png', 'dress')">
-            <img src="dress4.png" alt="Dress 4">
-          </div>
-          <div class="clothing-item" data-type="dress" onclick="selectItem('dress5.png', 'dress')">
-            <img src="dress5.png" alt="Dress 5">
-          </div>
-          <div class="clothing-item" data-type="dress" onclick="selectItem('dress6.png', 'dress')">
-            <img src="dress6.png" alt="Dress 6">
-          </div>
+      <div class="preview-grid" id="dresses" style="display: none;">
+        <div class="preview-item" onclick="selectItem('dress1.png', 'dresses')">
+          <img src="dress1.png" alt="Dress 1">
         </div>
-        <button class="remove-button" onclick="removeItem('dress')">Remove Dress</button>
+        <div class="preview-item" onclick="selectItem('dress2.png', 'dresses')">
+          <img src="dress2.png" alt="Dress 2">
+        </div>
+        <div class="preview-item" onclick="selectItem('dress3.png', 'dresses')">
+          <img src="dress3.png" alt="Dress 3">
+        </div>
+        <div class="preview-item" onclick="selectItem('dress4.png', 'dresses')">
+          <img src="dress4.png" alt="Dress 4">
+        </div>
+        <div class="preview-item" onclick="selectItem('dress5.png', 'dresses')">
+          <img src="dress5.png" alt="Dress 5">
+        </div>
       </div>
     </div>
-    <div class="image-container">
-      <canvas id="fashionCanvas"></canvas>
+    <div class="preview-stage">
+      <div class="preview-container">
+        <canvas id="avatarCanvas"></canvas>
+      </div>
     </div>
   </div>
   <script>
-    // p5.js sketch
-    let sketch = function(p) {
-      let baseImage;
-      let imgMap = {};
-      let activeItems = {
-        shirt: '',
-        skirt: '',
-        dress: ''
-      };
-
-      p.preload = function() {
-        baseImage = p.loadImage('BASE.png');
-        // Preload all images
-        ['shirt1.png', 'shirt2.png', 'shirt3.png', 'shirt4.png', 'shirt5.png',
-         'skirt1.png', 'skirt2.png', 'skirt3.png', 'skirt4.png', 'skirt5.png',
-         'dress1.png', 'dress2.png', 'dress3.png', 'dress4.png', 'dress5.png', 'dress6.png']
-          .forEach(imgName => {
-            imgMap[imgName] = p.loadImage(imgName);
-          });
-      };
-
-      p.setup = function() {
-        let canvas = p.createCanvas(500, 667);
-        canvas.parent('fashionCanvas');
-        p.noLoop();
-      };
-
-      p.draw = function() {
-        p.clear();
-        // Draw base image
-        if (baseImage) {
-          p.image(baseImage, 0, 0);
-        }
-        
-        // Draw active clothing items in order (skirt, dress, shirt)
-        if (activeItems.skirt && imgMap[activeItems.skirt]) {
-          p.image(imgMap[activeItems.skirt], 0, 0);
-        }
-        if (activeItems.dress && imgMap[activeItems.dress]) {
-          p.image(imgMap[activeItems.dress], 0, 0);
-        }
-        if (activeItems.shirt && imgMap[activeItems.shirt]) {
-          p.image(imgMap[activeItems.shirt], 0, 0);
-        }
-      };
-
-      // Make these functions available globally
-      window.selectItem = function(imgName, type) {
-        // Update active item
-        activeItems[type] = imgName;
-        
-        // Update UI
-        const prevActive = document.querySelector(`.clothing-item[data-type="${type}"].active`);
-        if (prevActive) {
-          prevActive.classList.remove('active');
-        }
-        
-        const newActive = document.querySelector(`.clothing-item[data-type="${type}"][onclick*="${imgName}"]`);
-        if (newActive) {
-          newActive.classList.add('active');
-        }
-        
-        // Redraw the canvas
-        p.redraw();
-      };
-
-      window.removeItem = function(type) {
-        // Remove active class from current item
-        const activeItem = document.querySelector(`.clothing-item[data-type="${type}"].active`);
-        if (activeItem) {
-          activeItem.classList.remove('active');
-        }
-
-        // Clear the active item
-        activeItems[type] = '';
-        
-        // Redraw the canvas
-        p.redraw();
-      };
+    let baseImage;
+    let currentImage;
+    let imgMap = {};
+    let activeTab = 'shirts';
+    let activeItems = {
+      shirts: '',
+      skirts: '',
+      dresses: ''
     };
 
-    // Create a new p5 instance
-    new p5(sketch);
+    function preload() {
+      const baseImage = loadImage('BASE.png');
+      const imgMap = {};
+      // Preload all images
+      ['shirt1.png', 'shirt2.png', 'shirt3.png', 'shirt4.png', 'shirt5.PNG',
+       'skirt1.png', 'skirt2.png', 'skirt3.png', 'skirt4.png', 'skirt5.PNG',
+       'dress1.png', 'dress2.png', 'dress3.png', 'dress4.png', 'dress5.png']
+        .forEach(imgName => {
+          imgMap[imgName] = loadImage(imgName);
+        });
+    }
+
+    function setup() {
+      createCanvas(765, 1000);
+      const baseImage = loadImage('BASE.png');
+      drawBase(baseImage);
+    }
+
+    function draw() {
+      drawBase(baseImage);
+      if (activeItems[activeTab]) {
+        image(imgMap[activeItems[activeTab]], 0, 0);
+      }
+    }
+
+    function drawBase() {
+      if (baseImage) {
+        image(baseImage, 0, 0);
+      }
+    }
+
+    function selectItem(imgName, category) {
+      // Remove active class from previous item
+      const prevActive = document.querySelector(`.${category} .preview-item.active`);
+      if (prevActive) {
+        prevActive.classList.remove('active');
+      }
+
+      // Add active class to new item
+      const newActive = document.querySelector(`.${category} .preview-item[onclick*="${imgName}"]`);
+      if (newActive) {
+        newActive.classList.add('active');
+      }
+
+      // Update active item
+      const activeItems = {
+        shirts: '',
+        skirts: '',
+        dresses: ''
+      };
+      activeItems[category] = imgName;
+      const activeTab = category;
+
+      // Update active tab
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.classList.remove('active');
+        const tabId = tab.getAttribute('data-tab');
+        if (tabId === category) {
+          tab.classList.add('active');
+        }
+      });
+
+      // Show/hide grid sections
+      const grids = document.querySelectorAll('.preview-grid');
+      grids.forEach(grid => {
+        grid.style.display = grid.id === category ? 'grid' : 'none';
+      });
+    }
 
     // Initialize tab click handlers
-    document.addEventListener('DOMContentLoaded', function() {
-      // Show shirts tab by default
-      document.getElementById('shirts').style.display = 'block';
-      document.querySelector('[data-tab="shirts"]').classList.add('active');
-      
-      // Set up tab switching
+    window.addEventListener('load', () => {
       document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-          const tabId = this.getAttribute('data-tab');
-          
-          // Update active tab
-          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          
-          // Show selected tab content
-          document.querySelectorAll('.tab-content').forEach(content => {
-            content.style.display = 'none';
-          });
-          document.getElementById(tabId).style.display = 'block';
+        tab.addEventListener('click', () => {
+          const category = tab.getAttribute('data-tab');
+          selectItem(activeItems[category], category);
         });
       });
     });
+  </script>
+</body>
+</html>
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="preview-table">
+      <h2>Choose an Item</h2>
+      <div class="preview-grid" id="shirts">
+        <div class="preview-item" onclick="selectItem('shirt1.png')">
+          <img src="shirt1.png" alt="Shirt 1">
+        </div>
+        <div class="preview-item" onclick="selectItem('shirt2.png')">
+          <img src="shirt2.png" alt="Shirt 2">
+        </div>
+        <div class="preview-item" onclick="selectItem('shirt3.png')">
+          <img src="shirt3.png" alt="Shirt 3">
+        </div>
+        <div class="preview-item" onclick="selectItem('shirt4.png')">
+          <img src="shirt4.png" alt="Shirt 4">
+        </div>
+        <div class="preview-item" onclick="selectItem('shirt5.PNG')">
+          <img src="shirt5.PNG" alt="Shirt 5">
+        </div>
+      </div>
+      <div class="preview-grid" id="skirts">
+        <div class="preview-item" onclick="selectItem('skirt1.png')">
+          <img src="skirt1.png" alt="Skirt 1">
+        </div>
+        <div class="preview-item" onclick="selectItem('skirt2.png')">
+          <img src="skirt2.png" alt="Skirt 2">
+        </div>
+        <div class="preview-item" onclick="selectItem('skirt3.png')">
+          <img src="skirt3.png" alt="Skirt 3">
+        </div>
+        <div class="preview-item" onclick="selectItem('skirt4.png')">
+          <img src="skirt4.png" alt="Skirt 4">
+        </div>
+        <div class="preview-item" onclick="selectItem('skirt5.PNG')">
+          <img src="skirt5.PNG" alt="Skirt 5">
+        </div>
+      </div>
+      <div class="preview-grid" id="dresses">
+        <div class="preview-item" onclick="selectItem('dress1.png')">
+          <img src="dress1.png" alt="Dress 1">
+        </div>
+        <div class="preview-item" onclick="selectItem('dress2.png')">
+          <img src="dress2.png" alt="Dress 2">
+        </div>
+        <div class="preview-item" onclick="selectItem('dress3.png')">
+          <img src="dress3.png" alt="Dress 3">
+        </div>
+        <div class="preview-item" onclick="selectItem('dress4.png')">
+          <img src="dress4.png" alt="Dress 4">
+        </div>
+        <div class="preview-item" onclick="selectItem('dress5.png')">
+          <img src="dress5.png" alt="Dress 5">
+        </div>
+      </div>
+    </div>
+    <div class="avatar-display">
+      <canvas id="avatarCanvas"></canvas>
+    </div>
+  </div>
+  <script>
+    let baseImage;
+    let currentImage;
+    let imgMap = {};
+
+    function preload() {
+      baseImage = loadImage('BASE.png');
+      // Preload all images
+      ['shirt1.png', 'shirt2.png', 'shirt3.png', 'shirt4.png', 'shirt5.PNG',
+       'skirt1.png', 'skirt2.png', 'skirt3.png', 'skirt4.png', 'skirt5.PNG',
+       'dress1.png', 'dress2.png', 'dress3.png', 'dress4.png', 'dress5.png']
+        .forEach(imgName => {
+          imgMap[imgName] = loadImage(imgName);
+        });
+    }
+
+    function setup() {
+      createCanvas(2550, 3300);
+      background(255);
+      drawBase();
+    }
+
+    function draw() {
+      drawBase();
+    }
+
+    function drawBase() {
+      if (baseImage) {
+        image(baseImage, 0, 0);
+      }
+    }
+
+    function selectItem(imgName) {
+      currentImage = imgMap[imgName];
+    }
   </script>
 </body>
 </html>
