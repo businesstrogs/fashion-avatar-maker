@@ -40,16 +40,15 @@
         flex-direction: row;
         padding: 5px;
         min-height: 100vh;
-        height: 100vh;
-        max-height: 100vh;
-        overflow: hidden;
+        height: auto;
+        align-items: flex-start; /* Align items to the top */
         gap: 5px;
       }
       
       .clothing-panel {
         width: 45%;
         max-height: 100vh;
-        height: 100%;
+        height: 100vh; /* Full viewport height */
         overflow-y: auto;
         padding: 5px;
         flex-shrink: 0;
@@ -57,12 +56,32 @@
       
       .image-container {
         width: 55%;
-        height: 100%;
-        max-height: 100vh;
+        height: 100vh; /* Full viewport height */
         padding: 5px;
         display: flex;
-        align-items: center;
+        align-items: flex-start; /* Align to top */
         justify-content: center;
+        position: sticky;
+        top: 0;
+      }
+      
+      /* Adjust clothing grid for 2x2x1 layout */
+      .clothing-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      
+      .clothing-item {
+        margin: 0;
+        padding: 5px;
+        aspect-ratio: 1/1;
+      }
+      
+      /* Ensure avatar fits well */
+      .avatar-wrapper {
+        max-width: 100%;
+        max-height: 100%;
+        margin-top: 10px;
       }
       
       .avatar-wrapper {
